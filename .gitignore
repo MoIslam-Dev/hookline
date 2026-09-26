@@ -24,3 +24,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Release archives (built by MARKETING/build-release.sh, uploaded manually)
+dist/

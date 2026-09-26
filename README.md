@@ -363,8 +363,13 @@ hookline/
 │       └── ui.js         static dashboard
 ├── public/               dashboard (index.html, styles.css, app.js, favicon.svg)
 ├── test/hookline.test.js
+├── DEMO.md               90-second feature walkthrough
+├── CHANGELOG.md
 └── data/                 created at runtime, git-ignored
 ```
+
+See [DEMO.md](DEMO.md) for the fastest way to see everything working, and
+[CHANGELOG.md](CHANGELOG.md) for what changed in each version.
 
 ## Troubleshooting
 

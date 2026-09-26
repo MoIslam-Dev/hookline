@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HookLine — webhook &amp; request inspector</title>
+    <meta name="description" content="Capture, inspect and replay any HTTP request sent to your own machine." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="unlock" id="unlock" hidden>
+      <form class="unlock__card" id="unlockForm" autocomplete="off">
+        <div class="unlock__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M7 7h10a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8" />
+            <circle cx="5" cy="7" r="2" fill="currentColor" stroke="none" />
+          </svg>
+        </div>
+        <h1>HookLine</h1>
+        <p class="unlock__lead">
+          Enter the API token printed in your terminal when HookLine started. It is stored only in this
+          browser.
+        </p>
+        <label class="field">
+          <span class="field__label">API token</span>
+          <input id="unlockToken" type="password" placeholder="e.g. k3f9x2…" spellcheck="false" required />
+        </label>
+        <p class="unlock__error" id="unlockError" hidden></p>
+        <button class="btn btn--primary btn--block" type="submit" id="unlockSubmit">Unlock dashboard</button>
+        <p class="unlock__hint">
+          Running locally? The token is also printed next to <code>API token</code> in the startup banner.
+        </p>
+      </form>
+    </div>
+
+    <div class="app" id="app" hidden>
+      <header class="topbar">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M7 7h10a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8" />
+            <circle cx="5" cy="7" r="2" fill="currentColor" stroke="none" />
+          </svg>
+          <span class="brand__name">HookLine</span>
+          <span class="brand__version" id="version"></span>
+        </div>
+        <div class="topbar__right">
+          <span class="pill pill--ghost" id="publicUrl" title="Public base URL"></span>
+          <button class="btn btn--ghost" id="lockBtn" type="button" title="Forget the stored token">Lock</button>
+          <button class="btn btn--primary" id="newBinBtn" type="button">+ New endpoint</button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="sidebar__head">
+            <span>Endpoints</span>
+            <span class="muted" id="binCount"></span>
+          </div>
+          <ul class="binlist" id="binList"></ul>
+          <div class="sidebar__foot" id="globalStats"></div>
+        </aside>
+
+        <main class="content" id="content">
+          <div class="empty" id="globalEmpty" hidden>
+            <h2>No endpoints yet</h2>
+            <p>
+              Create an endpoint to get a unique URL. Point a webhook, a <code>curl</code> command or your
+              own integration at it and every request shows up here.
+            </p>
+            <button class="btn btn--primary" id="emptyCreateBtn" type="button">Create your first endpoint</button>
+          </div>
+
+          <div id="binPanel" hidden>
+            <section class="endpoint">
+              <div class="endpoint__top">
+                <div>
+                  <h1 class="endpoint__name" id="binName"></h1>
+                  <div class="endpoint__url">
+                    <code id="binUrl"></code>
+                    <button class="icon-btn" id="copyUrlBtn" type="button" title="Copy endpoint URL">Copy</button>
+                  </div>
+                </div>
+                <div class="endpoint__actions">
+                  <button class="btn btn--ghost" id="togglePauseBtn" type="button">Pause</button>
+                  <button class="btn btn--ghost" id="renameBtn" type="button">Rename</button>
+                  <button class="btn btn--ghost" id="exportBtn" type="button">Export</button>
+                  <button class="btn btn--ghost" id="clearBtn" type="button">Clear</button>
+                  <button class="btn btn--danger" id="deleteBtn" type="button">Delete</button>
+                </div>
+              </div>
+              <div class="endpoint__meta" id="binMeta"></div>
+            </section>
+
+            <section class="stats" id="stats"></section>
+
+            <section class="toolbar">
+              <div class="field field--search">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.5-3.5" stroke-linecap="round" />
+                </svg>
+                <input id="searchInput" type="search" placeholder="Search path, headers or body…" spellcheck="false" />
+              </div>
+              <select id="methodFilter" class="select" aria-label="Filter by method">
+                <option value="">All methods</option>
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+                <option>HEAD</option>
+                <option>OPTIONS</option>
+              </select>
+              <select id="statusFilter" class="select" aria-label="Filter by response status">
+                <option value="">All responses</option>
+                <option value="2xx">2xx success</option>
+                <option value="3xx">3xx redirect</option>
+                <option value="4xx">4xx client error</option>
+                <option value="5xx">5xx server error</option>
+                <option value="error">Errors only</option>
+              </select>
+              <label class="switch">
+                <input type="checkbox" id="autoRefresh" checked />
+                <span>Auto refresh</span>
+              </label>
+            </section>
+
+            <section class="requests">
+              <div class="requests__head">
+                <h2>Requests <span class="muted" id="requestCount"></span></h2>
+                <button class="btn btn--ghost btn--sm" id="refreshBtn" type="button">Refresh</button>
+              </div>
+              <div class="table-wrap" id="tableWrap">
+                <table class="requests__table">
+                  <thead>
+                    <tr>
+                      <th class="col-time">Received</th>
+                      <th class="col-method">Method</th>
+                      <th class="col-path">Path</th>
+                      <th class="col-status">Response</th>
+                      <th class="col-size">Size</th>
+                    </tr>
+                  </thead>
+                  <tbody id="requestRows"></tbody>
+                </table>
+              </div>
+              <div class="requests__foot">
+                <p class="muted" id="listHint"></p>
+                <button class="btn btn--ghost btn--sm" id="loadMoreBtn" type="button" hidden>Load more</button>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+
+      <aside class="drawer" id="drawer" hidden aria-label="Request detail">
+        <header class="drawer__head">
+          <div>
+            <p class="drawer__eyebrow" id="drawerEyebrow"></p>
+            <h2 class="drawer__title" id="drawerTitle"></h2>
+          </div>
+          <div class="drawer__head-actions">
+            <button class="icon-btn" id="copyCurlBtn" type="button" title="Copy as cURL">cURL</button>
+            <button class="icon-btn" id="closeDrawerBtn" type="button" title="Close (Esc)">Close</button>
+          </div>
+        </header>
+        <div class="drawer__meta" id="drawerMeta"></div>
+        <nav class="tabs" id="drawerTabs" role="tablist">
+          <button class="tab is-active" data-tab="body" role="tab" type="button">Body</button>
+          <button class="tab" data-tab="headers" role="tab" type="button">Headers</button>
+          <button class="tab" data-tab="query" role="tab" type="button">Query</button>
+          <button class="tab" data-tab="code" role="tab" type="button">Code</button>
+          <button class="tab" data-tab="replay" role="tab" type="button">Replay</button>
+        </nav>
+        <div class="drawer__body">
+          <div class="tabpanel is-active" data-panel="body" id="panelBody"></div>
+          <div class="tabpanel" data-panel="headers" id="panelHeaders"></div>
+          <div class="tabpanel" data-panel="query" id="panelQuery"></div>
+          <div class="tabpanel" data-panel="code" id="panelCode"></div>
+          <div class="tabpanel" data-panel="replay" id="panelReplay"></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="modal" id="modal" hidden>
+      <div class="modal__backdrop" data-close="1"></div>
+      <form class="modal__card" id="modalForm">
+        <h2 id="modalTitle">Create endpoint</h2>
+        <div id="modalFields"></div>
+        <p class="modal__error" id="modalError" hidden></p>
+        <div class="modal__actions">
+          <button class="btn btn--ghost" type="button" data-close="1">Cancel</button>
+          <button class="btn btn--primary" type="submit" id="modalSubmit">Create</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

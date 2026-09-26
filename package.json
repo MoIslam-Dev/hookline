@@ -1,0 +1,35 @@
+{
+  "name": "hookline",
+  "version": "1.0.0",
+  "description": "Self-hosted webhook and API request inspector. Capture any HTTP request to a unique URL, inspect it, replay it, and copy it as cURL, JavaScript, Python or raw HTTP.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "webhook",
+    "webhooks",
+    "request-inspector",
+    "requestbin",
+    "webhook.site-alternative",
+    "developer-tools",
+    "self-hosted"
+  ],
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "bin": {
+    "hookline": "src/cli.js"
+  },
+  "files": [
+    "src",
+    "public",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node src/cli.js",
+    "dev": "node src/cli.js --dev",
+    "test": "node --test"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

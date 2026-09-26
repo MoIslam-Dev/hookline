@@ -1,0 +1,58 @@
+# Fly.io config for a public demo of HookLine.
+#
+#   fly launch --no-deploy        (or: fly apps create hookline-demo)
+#   cp this file to ./fly.toml
+#   fly secrets set HOOKLINE_TOKEN=$(openssl rand -hex 24)
+#   fly volumes create hookline_data --size 1     # once
+#   fly deploy
+#   fly open
+#
+# A 1 GB volume is the minimum Fly sells. It keeps the SQLite file across
+# deploys; without a volume Fly's ephemeral filesystem wipes captured requests on
+# every restart.
+
+app = "hookline-demo"
+primary_region = "cdg"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  HOST = "0.0.0.0"
+  PORT = "4000"
+  HOOKLINE_DATA = "/data"
+  HOOKLINE_RETENTION = "7"
+  NODE_ENV = "production"
+  # Without this, the banner and every generated share link would point at
+  # http://localhost:4000 instead of your real hostname.
+  HOOKLINE_PUBLIC_URL = "https://hookline-demo.fly.dev"
+
+# Do not bake a token into the image. Set it with:
+#   fly secrets set HOOKLINE_TOKEN=$(openssl rand -hex 24)
+
+[[mounts]]
+  source = "hookline_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 4000
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+  # A demo is a public endpoint, so do not let a single visitor pin a machine awake.
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 100
+    hard_limit = 200
+
+[[http_service.checks]]
+  grace_period = "5s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

@@ -1,0 +1,24 @@
+# Your captured requests and your API token must never end up in a published image.
+# data/ is git-ignored but NOT docker-ignored by default, so it must be listed here.
+data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.env
+.env.*
+dist/
+MARKETING/
+.git/
+.gitignore
+node_modules/
+npm-debug.log*
+*.log
+.DS_Store
+Dockerfile
+.dockerignore
+docker-compose.yml
+fly.toml
+README.md
+DEMO.md
+CHANGELOG.md
+test/

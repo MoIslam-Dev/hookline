@@ -91,7 +91,7 @@ history, search, replay and code generation — and it starts with one command.
 
 | Layer | Choice | Why |
 | --- | --- | --- |
-| Runtime | Node.js ≥ 22.5 (`node:http` only) | The tool *is* an HTTP server; a framework would add weight and nothing else |
+| Runtime | Node.js ≥ 22.13 (`node:http` only) | The tool *is* an HTTP server; a framework would add weight and nothing else |
 | Database | `node:sqlite` (bundled with Node) | Structured, searchable, survives restarts — with zero `npm install` |
 | Dashboard | Vanilla HTML + CSS + ES modules | No build step, no bundler, instant cold start, easy to restyle |
 | Dependencies | **None** | `git clone && npm start` works offline |
@@ -110,8 +110,14 @@ npm start
 ```
 
 There is nothing to install — HookLine has no runtime dependencies. Cloning and
-starting is the whole installation. Node.js 22.5 or newer is required (for
-`node:sqlite`); check with `node --version`.
+starting is the whole installation. Node.js **22.13 or newer** is required; check
+with `node --version`.
+
+> **Why 22.13 and not 22.5?** `node:sqlite` was introduced in 22.5.0, but it stayed
+> behind the `--experimental-sqlite` flag until **22.13.0**. On 22.5–22.12 you would
+> have to start the app with that flag, so those versions are not supported. Node 24
+> LTS is recommended — on that version the module is available without a flag and
+> prints no experimental warning.
 
 Optional, to use the `hookline` command from anywhere:
 
@@ -298,7 +304,29 @@ near the bottom of `app.js`).
 ## Deploying
 
 HookLine is a single Node process with one stateful folder, so anything that runs
-Node 22.5+ works.
+Node 22.13+ works.
+
+**With Docker (any host, no Node install needed):**
+
+```bash
+docker build -t hookline .
+docker run -d --name hookline -p 4000:4000 \
+  -e HOOKLINE_TOKEN=$(openssl rand -hex 24) \
+  -v hookline-data:/app/data \
+  --restart unless-stopped \
+  hookline
+```
+
+Or with the included Compose file:
+
+```bash
+HOOKLINE_TOKEN=$(openssl rand -hex 24) docker compose up -d
+```
+
+The image is based on Node 24 Alpine, has no dependencies to install, runs as a
+non-root user and declares a health check against `/api/health`. `-v hookline-data:/app/data`
+is not optional decoration: the SQLite database lives in that folder, and without a
+volume it is lost when the container is replaced.
 
 **On a VPS or Raspberry Pi (most common):**
 

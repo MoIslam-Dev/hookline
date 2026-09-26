@@ -45,8 +45,10 @@ while leaving room on your own storefront.
 ## Requirements / "what you need to run this"
 
 ```
-Node.js 22.5.0 or newer (uses the built-in node:sqlite module — nothing to install)
-No database server, no Docker, no npm dependencies
+Node.js 22.13.0 or newer (Node 24 LTS recommended). Uses the built-in node:sqlite
+module, so there is nothing to install
+No database server, no npm dependencies, no build step
+Docker optional — a Dockerfile and docker-compose.yml are included
 Runs on Linux, macOS and Windows
 Takes about 2 MB of RAM when idle
 ```
@@ -81,6 +83,12 @@ QUICK START
 That is the whole installation — HookLine has zero runtime dependencies. Open the
 dashboard, paste the API token from the banner into the unlock screen, create an
 endpoint and you have a URL to test against.
+
+Prefer Docker? A Dockerfile and docker-compose.yml are included, built on Node 24
+Alpine, running as a non-root user with a health check:
+
+    docker run -d -p 4000:4000 -e HOOKLINE_TOKEN=your-token \
+      -v hookline-data:/app/data hookline
 
     curl -X POST http://127.0.0.1:4000/api/bins \
       -H "x-hookline-token: YOUR_TOKEN" \
@@ -136,7 +144,6 @@ headers let HookLine answer with whatever your integration will meet in producti
 The same values work as query parameters: ?__status=500, ?__delay=8000, ?__body=...
 
 OPERATIONS
-
 - Single-file SQLite database, created automatically, auto-pruned to each endpoint's
   retention window.
 - API token required on every management call, compared in constant time.
@@ -147,6 +154,8 @@ OPERATIONS
 
 WHAT IS INCLUDED
 
+- Dockerfile (Node 24 Alpine, non-root, health check) + docker-compose.yml + a
+  ready-to-use fly.toml, if you would rather deploy than install
 - Full source code (src/ — 8 modules, commented where it matters)
 - Dashboard front end (public/ — vanilla HTML, CSS and JavaScript, no framework)
 - Automated test suite: 45 tests across 9 suites, run with npm test
@@ -157,8 +166,9 @@ WHAT IS INCLUDED
 
 REQUIREMENTS
 
-- Node.js 22.5.0 or newer (for the built-in node:sqlite module)
-- No dependencies to install, no database to provision, no Docker required
+- Either Node.js 22.13.0 or newer (Node 24 LTS recommended — built-in node:sqlite
+  module, nothing to install), or Docker, in which case no Node install is needed at all
+- No dependencies to install, no database to provision
 
 A NOTE ON HONESTY
 

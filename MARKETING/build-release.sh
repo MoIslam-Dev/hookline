@@ -33,7 +33,7 @@ DEST="$STAGE/hookline"
 
 # --- what the buyer receives -------------------------------------------------
 mkdir -p "$DEST"
-for item in src public test package.json package-lock.json README.md DEMO.md CHANGELOG.md LICENSE; do
+for item in src public test package.json package-lock.json README.md DEMO.md CHANGELOG.md LICENSE Dockerfile .dockerignore docker-compose.yml fly.toml; do
   if [ -e "$ROOT/$item" ]; then
     cp -R "$ROOT/$item" "$DEST/"
   fi

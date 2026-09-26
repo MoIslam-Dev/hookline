@@ -1,0 +1,23 @@
+# Local Docker test of the published image.
+#
+#   docker compose up --build
+#   open http://127.0.0.1:4000 and paste the token from the logs
+#
+# The token below is a throwaway for local use only. Never commit a real one.
+services:
+  hookline:
+    build: .
+    image: hookline:local
+    container_name: hookline
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:4000:4000'
+    environment:
+      HOOKLINE_TOKEN: ${HOOKLINE_TOKEN:-local-dev-token-change-me}
+      HOOKLINE_RETENTION: '7'
+      HOOKLINE_MAX_BODY: '1048576'
+    volumes:
+      - hookline-data:/app/data
+
+volumes:
+  hookline-data:

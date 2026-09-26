@@ -27,3 +27,6 @@ Thumbs.db
 
 # Release archives (built by MARKETING/build-release.sh, uploaded manually)
 dist/
+
+# Internal marketplace copy and release tooling — not part of the public repo
+MARKETING/

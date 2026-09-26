@@ -348,6 +348,20 @@ describe('filtering, search and pagination', () => {
     assert.equal(requests.length, 5);
   });
 
+  it('filters by 2xx/3xx/4xx/5xx class, not as an exact code', async () => {
+    const two = await (await api(`/bins/${targetId()}/requests?status=2xx`)).json();
+    assert.equal(two.requests.length, 5);
+    assert.ok(two.requests.every((item) => item.responseStatus >= 200 && item.responseStatus < 300));
+
+    for (const className of ['3xx', '4xx', '5xx']) {
+      const empty = await (await api(`/bins/${targetId()}/requests?status=${className}`)).json();
+      assert.equal(empty.requests.length, 0, `${className} should be empty`);
+    }
+
+    const errors = await (await api(`/bins/${targetId()}/requests?status=error`)).json();
+    assert.equal(errors.requests.length, 0);
+  });
+
   it('paginates with the before cursor', async () => {
     const first = await (await api(`/bins/${targetId()}/requests?limit=2`)).json();
     assert.equal(first.requests.length, 2);

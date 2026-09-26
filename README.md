@@ -104,7 +104,7 @@ and indexed queries in a single file you can delete to reset everything.
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/hookline.git
+git clone https://github.com/MoIslam-Dev/hookline.git
 cd hookline
 npm start
 ```
@@ -303,7 +303,7 @@ Node 22.5+ works.
 **On a VPS or Raspberry Pi (most common):**
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/hookline.git
+git clone https://github.com/MoIslam-Dev/hookline.git
 cd hookline
 HOOKLINE_TOKEN=$(openssl rand -hex 24) nohup node src/cli.js --host 127.0.0.1 --port 4000 > hookline.log 2>&1 &
 ```
@@ -317,7 +317,7 @@ Put nginx or Caddy in front for TLS, then start HookLine with
 FROM node:22-alpine
 WORKDIR /app
 COPY . .
-ENV HOOKLINE_HOST=0.0.0.0 PORT=4000
+ENV HOST=0.0.0.0 PORT=4000
 VOLUME ["/app/data"]
 EXPOSE 4000
 CMD ["node", "src/cli.js"]

@@ -229,6 +229,10 @@ export class Store {
     }
     if (status === 'error') {
       clauses.push('response_status >= 400');
+    } else if (/^[1-5]xx$/.test(status)) {
+      clauses.push('response_status >= ? AND response_status < ?');
+      const first = Number(status[0]) * 100;
+      params.push(first, first + 100);
     } else if (status) {
       clauses.push('response_status = ?');
       params.push(Number(status));

@@ -1,15 +1,18 @@
 # Fly.io config for a public demo of HookLine.
 #
-#   fly launch --no-deploy        (or: fly apps create hookline-demo)
-#   cp this file to ./fly.toml
+#   fly apps create hookline-demo
 #   fly secrets set HOOKLINE_TOKEN=$(openssl rand -hex 24)
-#   fly volumes create hookline_data --size 1     # once
 #   fly deploy
 #   fly open
 #
-# A 1 GB volume is the minimum Fly sells. It keeps the SQLite file across
-# deploys; without a volume Fly's ephemeral filesystem wipes captured requests on
-# every restart.
+# NOTE ON STORAGE: this config deliberately does NOT mount a Fly volume, and
+# HookLine stores its SQLite file in the container's own filesystem. That is on
+# purpose. The image runs as the non-root `node` user, but a Fly volume is
+# mounted root-owned, so SQLite could not create its file there (EACCES, crash
+# loop). For a public demo, losing captured requests on each deploy is
+# acceptable — arguably preferable. If you later want persistence, either drop
+# `USER node` from the Dockerfile or add a root entrypoint that chowns the
+# mount before dropping privileges.
 
 app = "hookline-demo"
 primary_region = "cdg"
@@ -20,7 +23,7 @@ primary_region = "cdg"
 [env]
   HOST = "0.0.0.0"
   PORT = "4000"
-  HOOKLINE_DATA = "/data"
+  HOOKLINE_DATA = "/app/data"
   HOOKLINE_RETENTION = "7"
   NODE_ENV = "production"
   # Without this, the banner and every generated share link would point at
@@ -29,10 +32,6 @@ primary_region = "cdg"
 
 # Do not bake a token into the image. Set it with:
 #   fly secrets set HOOKLINE_TOKEN=$(openssl rand -hex 24)
-
-[[mounts]]
-  source = "hookline_data"
-  destination = "/data"
 
 [http_service]
   internal_port = 4000

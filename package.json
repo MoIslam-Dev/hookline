@@ -8,8 +8,11 @@
     "webhook",
     "webhooks",
     "request-inspector",
-    "requestbin",
-    "webhook.site-alternative",
+    "request-logger",
+    "webhook-tester",
+    "webhook-receiver",
+    "http-inspector",
+    "api-testing",
     "developer-tools",
     "self-hosted"
   ],
@@ -22,9 +25,24 @@
   "files": [
     "src",
     "public",
+    "test",
     "README.md",
-    "LICENSE"
+    "DEMO.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "Dockerfile",
+    "docker-compose.yml",
+    "fly.toml"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoIslam-Dev/hookline.git"
+  },
+  "homepage": "https://github.com/MoIslam-Dev/hookline#readme",
+  "bugs": {
+    "url": "https://github.com/MoIslam-Dev/hookline/issues"
+  },
+  "author": "Mo Islam",
   "scripts": {
     "start": "node src/cli.js",
     "dev": "node src/cli.js --dev",

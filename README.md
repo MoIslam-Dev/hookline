@@ -391,6 +391,10 @@ hookline/
 │       └── ui.js         static dashboard
 ├── public/               dashboard (index.html, styles.css, app.js, favicon.svg)
 ├── test/hookline.test.js
+├── package.json          zero dependencies, no install step
+├── Dockerfile            single-container image for self-hosting
+├── docker-compose.yml    one-command local run with a persistent volume
+├── fly.toml              config for deploying to Fly.io
 ├── DEMO.md               90-second feature walkthrough
 ├── CHANGELOG.md
 └── data/                 created at runtime, git-ignored

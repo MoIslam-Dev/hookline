@@ -140,7 +140,6 @@ export function buildConfig({ options = {}, env = {}, cwd = process.cwd() } = {}
     publicUrl: publicUrl.replace(/\/+$/, ''),
     token: options.token ?? env.HOOKLINE_TOKEN ?? null,
     dev: Boolean(options.dev ?? env.HOOKLINE_DEV),
-    log: options.log ?? env.HOOKLINE_LOG ?? null,
     help: Boolean(options.help),
     showVersion: Boolean(options.version),
   };

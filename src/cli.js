@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
-import path from 'node:path';
 
 import { HELP, VERSION, buildConfig, parseArgs } from './config.js';
 import { openDatabase } from './db.js';
@@ -107,8 +106,6 @@ async function main() {
 
   process.on('SIGINT', () => shutdown('SIGINT'));
   process.on('SIGTERM', () => shutdown('SIGTERM'));
-
-  if (config.log) fs.appendFileSync(path.resolve(config.log), `${new Date().toISOString()} started\n`);
 }
 
 main().catch((error) => {
